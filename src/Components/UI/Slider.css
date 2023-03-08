@@ -1,0 +1,8 @@
+.MuiSlider-valueLabel{
+    top: 55px !important
+}
+
+.MuiSlider-valueLabel:before{
+    top : -6px
+}
+

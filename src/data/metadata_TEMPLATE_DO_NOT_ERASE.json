@@ -1,0 +1,58 @@
+[ 
+  {"name": "cluster_label",
+  "label": "Cluster",
+  "type": "discrete",
+  "tooltip": "true",
+  "truncate_value": 10
+  },
+  {"name": "time",
+  "label": "Time",
+  "type": "discrete",
+  "tooltip": "only"
+  },
+   {"name": "cluster",
+  "label": "Cluster Number",
+  "type": "discrete"
+  },
+  {"name": "sic_code_label",
+  "label": "SIC Code",
+  "type": "discrete",
+  "tooltip" : "true",
+  "truncate_value": 10
+  },
+  {"name": "sic_code",
+  "label": "Sic code (number)",
+  "type": "continuous",
+  "color_bins": [1, 10, 20, 30, 40, 50, 60, 70],
+  "legend_dline_extral" : 10,
+  "scale_exponent": 1,
+  "scale_maxSize": 40,
+  "scale_minSize": 1,
+  "scale_increasing": "true"
+  },
+  {"name": "mkvalt",
+  "label": "Market Value",
+  "type": "continuous",
+  "color_bins": [1,10,100,300,600],
+  "size_legend_bins": [5, 100,300,600],
+  "legend_dline_extral" : 10,
+  "scale_exponent": 0.5,
+  "scale_maxSize": 50,
+  "scale_minSize": 1,
+  "scale_increasing": "true",
+  "unit": "B",
+  "tooltip" : "true",
+  "truncate_label": 10
+  },
+  {"name": "x",
+  "label": "X-axis",
+  "type": "continuous",
+  "color_bins": [-10, -5, 0, 5, 10],
+  "size_legend_bins": [-10, -5, 0, 5, 10],
+  "legend_dline_extral" : 10,
+  "scale_exponent": 1,
+  "scale_maxSize": 40,
+  "scale_minSize": 1,
+  "scale_increasing": "false"
+  }
+]

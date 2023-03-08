@@ -1,0 +1,1670 @@
+---
+editor_options:
+  chunk_output_type: console
+output:
+  pdf_document: 
+    template: "my-template.tex"
+    latex_engine: lualatex
+    keep_tex: yes
+params: 
+  clc_logo: "images/CLC-white.pdf"
+  nacms_logo: "images/NACMS.jpg"
+  nacms_back: "images/NACMS-back.pdf"
+  hex_1: "752936"
+  hex_2: "6f6f6f"
+  overall_gray: "bfbfbf"
+  graph_head: "5a5859"
+  table_dark_gray: "bfbfbf"
+  table_light_gray: "dfe3e5"
+  instit: "Bellarmine University"
+  control: "Private"
+  d_level: "Graduate"
+  year: '2022'
+  grad_year1: '2012'
+  grad_year2: '2017'
+clc_logo: '`r params$clc_logo`'
+nacms_logo: '`r params$nacms_logo`'
+nacms_back: '`r params$nacms_back`'
+hex_1: '`r params$hex_1`' # Darker color
+hex_2: '`r params$hex_2`' # Lighter color
+overall_gray: '`r params$overall_gray`' # For "Overall" bars in graphs
+graph_head: '`r params$graph_head`' # For bold header before graphs and tables
+table_dark_gray: '`r params$table_dark_gray`' # For first column of tables
+table_light_gray: '`r params$table_light_gray`' # For other columns of tables
+instit: '`r params$instit`'
+control: '`r params$control`'
+d_level: "`r params$d_level`" #!! double quotation was required since possible legacy value [bachelor's degree] included single quotation mark
+year: '`r params$year`'
+grad_year1: '`r params$grad_year1`'
+grad_year2: '`r params$grad_year2`'
+---
+
+\ignore{
+# Setup
+}
+
+```{r setup, echo = F}
+knitr::opts_chunk$set(echo = F, message = F, warning = F, 
+                      fig.align = 'center', fig.height = 2.4,
+                      table.align = 'center')
+```
+
+\ignore{
+## Source and package import
+}
+
+```{r}
+library(tidyverse)
+library(scales)
+library(kableExtra)
+library(flextable)
+wrap_20 = wrap_format(20) # https://stackoverflow.com/a/45493489/14095529
+```
+
+```{r}
+source('./src_figs_and_tabs/bar_chart.R')
+```
+
+\ignore{
+## YAML variables
+}
+
+```{r}
+### Color Scheme
+hex_1 <- paste0('#',params$hex_1) # Darker color
+hex_2 <- paste0('#',params$hex_2) # Lighter color
+overall_gray <- paste0('#',params$overall_gray) # For "Overall" bars in graphs
+table_dark_gray <- paste0('#',params$table_dark_gray) # For first column of tables
+table_light_gray <- paste0('#',params$table_light_gray) # For other columns of tables
+
+### College parameters ###
+instit <- params$instit
+d_level <- params$d_level
+d_lev_mark <- ifelse(d_level == "Undergraduate", 'UG', 'Grad')
+grad_year1 <- params$grad_year1
+grad_year2 <-  params$grad_year2
+year <- params$year
+control <- params$control
+
+### Keep even after development and put close to "Color Scheme" parameters ###
+tick <- 0
+grad_years <- c("Overall", grad_year1, grad_year2)
+col_pal <- c(overall_gray, hex_1,hex_2)
+barcol_matches <- sapply(grad_years, function(x){
+  tick <<- tick + 1
+  return(x = col_pal[tick])
+  })
+```
+
+\ignore{
+## Includegraphics functions
+}
+
+```{r}
+bd <- function(x){return(paste0('figs_and_tabs/', x))}
+Ig <- function(x){
+  return(paste0('\\includegraphics[width = \\textwidth]{figs_and_tabs/',
+                instit, "_", d_lev_mark, "_",
+                x, '}'))
+}
+igTrim <- function(x, a, b, c, d){
+  return(paste0('\\includegraphics[width = \\textwidth, clip, trim={', a, ' ', b, ' ', c, ' ', d, '}]{figs_and_tabs/',
+                instit, "_", d_lev_mark, "_",
+                x, '}'))
+}
+igBtab <- function(x){
+   return(paste0('\\includegraphics[width = \\textwidth, trim={1.15in 9in 0.65in 1.2in},clip]{figs_and_tabs/',
+                 instit, "_", d_lev_mark, "_",
+                 x, '}'))
+}
+igTest <- function(x){
+  full_name <- paste0('figs_and_tabs/', instit, "_", d_lev_mark, "_", x)
+  if(file.exists(paste0("./", full_name))){
+    return(paste0('\\includegraphics[width = \\textwidth]{', full_name, '}'))
+  }
+}
+```
+
+
+\ignore{ 
+# Data 
+}
+
+```{r}
+report_data <- read_csv('./processed_data/report_data.csv') %>%
+                filter(Institution %in% c(instit, 'National', control),
+                       DegreeLevel == d_level) %>%
+                mutate(MockPages = lapply(MockPages, function(x){eval(parse(text=x))})) %>% #https://stackoverflow.com/a/50281576/14095529
+                mutate(GradYear = factor(GradYear, levels = c('Overall', grad_year1, grad_year2))) %>% #Default appearance order in graphs
+                mutate(Institution = factor(Institution, levels = c(instit, control, 'National'))) #Default appearance order in graphs
+
+demo_groups <- read_csv('./processed_data/demo_groups.csv') %>%
+                filter(Institution == instit)
+```
+
+\ignore{ 
+# Cover Page 
+}
+
+<!-- Cover Page -->
+
+```{r}
+cover <- paste0('images/cover_pages/', year, '/',
+                str_remove_all(instit,':'),
+                ' GRAD ', ' Cover.pdf')
+```
+
+\includepdf[pages={1}]{`r cover`}
+
+\newpage
+
+<!-- Cover Page -->
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north east)}]
+\node[rectangle,
+    anchor=north east,xshift=-2cm,yshift=-1cm,
+    draw = lightgray,
+    text = white,
+    fill = hex1,
+    minimum width = 20cm,
+    minimum height = 1.8cm] (r) at (0,0) {\LARGE \hspace{-1.5in} \textbf{COPYRIGHT \& TRADEMARKS}};
+\end{tikzpicture}
+\vspace{1.2cm}
+
+\color{hex1}{\Large NATIONAL ALUMNI CAREER MOBILITY SURVEY}
+\color{black}
+
+\vspace{1cm}
+
+Copyright © \thisYear \vspace{12pt} by The Career Leadership Collective. All rights reserved.
+
+\vspace{1.5cm}
+
+This report displays trademarks of The Career Leadership Collective, proprietary research, and copyrighted materials that are protected by law.
+
+\vspace{1.5cm}
+
+The institution-specific data given to the institution receiving this report becomes the property of that institution, and they may use their data as they see fit.
+
+\vspace{1.5cm}
+
+\includegraphics[width=5cm]{images/CLC-blue.png}
+
+<!-- Initialize footer -->
+
+\setcounter{page}{2}
+\setlength{\footskip}{10pt}
+\fancyfoot[L]{
+\begin{tikzpicture}[remember picture,overlay]
+\draw[line width=3pt,color=hex1, xshift = -3cm] (0,0) -- (10,0);
+\end{tikzpicture}
+\\ \vspace{10pt}
+\begin{minipage}{0.15\textwidth}
+\begin{tikzpicture}[remember picture,overlay]
+\node[anchor=north west,xshift=-45px,yshift=30px]{
+  \includegraphics[width=3.5cm]{images/NACMS.png}
+};
+\end{tikzpicture}
+\end{minipage} \hfill
+\begin{minipage}{0.84\textwidth}
+\vspace{15pt}
+\color{lightgray}NACM \thisYear ~ SURVEY RESULTS | \color{hex2} \instit
+\color{black} \hfill \thepage
+\end{minipage}
+}
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north east)}]
+\node[rectangle,
+    anchor=north east,xshift=-7cm,yshift=-2cm,
+    draw = lightgray,
+    text = white,
+    fill = hex1,
+    minimum width = 15cm,
+    minimum height = 1.8cm] (r) at (0,0) {\LARGE \hspace{-0.6in} \textbf{TABLE OF CONTENTS}};
+\end{tikzpicture}
+\vspace{1.5cm}
+
+\tableofcontents
+
+\newpage
+
+\ignore{ 
+# About NACM
+}
+
+\def\shortTitle{TRUE}
+\section{ABOUT NACM}
+
+\ignore{ 
+## Overview 
+}
+\subsection*{OVERVIEW}
+
+The Career Leadership Collective is a thought partner and consulting group for colleges and universities that assists senior campus leaders and career services leaders with systemically weaving career and future preparation into the fabric of the campus experience. They have done business with over 1,000 colleges and universities since 2017 and provide strategic growth consulting, training, DEI analysis services, conferences, online content, and are the home of the National Alumni Career Mobility survey.
+
+\medskip
+
+In addition to the National Alumni Career Mobility survey for 5- and 10-year alums, The Career Leadership Collective offers NACM Complete for all campus alum, NACM Select for select class years, and EMBARK First Destination Survey (FDS) services for collecting data about recent graduates.
+
+\medskip
+
+The Collective regularly provides data consulting, system change consulting, executive search for career services leaders, and has a robust partnership with the Career Launch Academy, the content leader in teaching students to build social capital at scale.
+
+\ignore{ 
+## Your NACM Deliverables
+}
+\subsection*{YOUR NACM DELIVERABLES}
+
+Each NACM partner school receives the following:
+
+1. \textbf{Unit Data File}: Contains all campus raw survey data separated into responses, scraped data, and custom questions.
+
+2. \textbf{Interactive Dashboard}: Created for you to identify trends, growth areas and success stories. We do not recommend making the complete, private dashboard available to the public.  
+
+3. \textbf{Campus report (this document)}: This report contains institutional data, alongside  national data.
+
+4. \textbf{Slide deck}: Contains a visual presentation of campus highlights and key data points, designed for sharing with stakeholders.
+
+5. \textbf{Data Scrape File}: Contains a internet data scrape based on name and institution contained in the original alumni file. Campuses may choose to use this to supplement individual-level employment information in campus information systems.
+
+\newpage
+
+\ignore{ 
+# EXECUTIVE SUMMARY
+}
+\section{EXECUTIVE SUMMARY}
+
+\ignore{ 
+## Data Sources
+}
+\subsection*{DATA SOURCES}
+
+`r igTrim('data_sources.pdf', '1.15in', '9in', '0.65in', '1.2in')`
+
+\ignore{ 
+## Alumni Snapshot
+}
+\subsection*{ALUMNI SNAPSHOT}
+
+`r Ig('alum_snap.pdf')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 20cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/CMI-pic-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# CAREER MOBILITY INDEX 
+}
+\def\shortTitle{FALSE}
+\section{CAREER MOBILITY INDEX }
+
+\newpage
+
+\ignore{ 
+## High Impact Career Mobility Practices 
+}
+\subsection{HIGH IMPACT CAREER MOBILITY PRACTICES}
+
+In-depth analysis of our national sample revealed six Career Mobility Practices that stood out as the factors most likely to influence overall alumni career mobility. An overview of the Career Mobility Index™ (CMI) that was used to discern these practices can be found in the methodology section. The top six High Impact Career Mobility Practices are: 
+
+\begin{itemize}
+  \item Completing internships or related experiences related to current career
+  \item Receiving helpful career advice
+  \begin{itemize}
+    \item	Receiving helpful advice in general
+    \item	Receiving helpful advice from faculty
+    \item	Receiving helpful advice from employers
+  \end{itemize}
+  \item Creating a career plan
+  \item Networking with employers
+  \item Understanding career opportunities
+  \item Learning critical thinking skills
+\end{itemize}
+
+Below are your results from the Career Mobility Index™ and High Impact Career Mobility Practices. 
+
+\graphHead{The internship(s) or related experience(s) that I completed while earning my degree were related to my current career.}
+
+\ignore{ 
+### Q108_8
+}
+`r Ig('Q108_8.pdf')`
+
+\newpage
+
+\graphHead{The career advice I received has been helpful.}
+
+\ignore{ 
+### Q184_9
+}
+
+`r Ig('Q184_9.pdf')`
+
+\graphHead{The career advice I received from faculty has been helpful.}
+
+\ignore{ 
+### Q186_9
+}
+
+`r Ig('Q186_9.pdf')`
+
+\graphHead{The career advice I received from my employer during my degree has been helpful.}
+
+\ignore{ 
+### Q191_9
+}
+
+`r Ig('Q191_9.pdf')`
+
+\newpage
+
+\graphHead{My institution helped me create a plan for my career.}
+
+\ignore{ 
+### Q13_10
+}
+
+`r Ig('Q13_10.pdf')`
+
+\graphHead{My institution helped me to network with employers.}
+
+\ignore{ 
+### Q21_10
+}
+
+`r Ig('Q21_10.pdf')`
+
+\graphHead{My institution helped me to understand career opportunities.}
+
+\ignore{ 
+### Q12_10
+}
+
+`r Ig('Q12_10.pdf')`
+
+\newpage
+
+\graphHead{My degree helped me gain critical thinking skills.}
+
+\ignore{ 
+### Q319_11
+}
+
+`r Ig('Q319_11.pdf')`
+\newpage
+
+\ignore{ 
+## Career Mobility Research Themes
+}
+\subsection{CAREER MOBILITY RESEARCH THEMES}
+
+Below are your results regarding the five core research themes of the National Alumni Career Mobility Survey. A breakdown of results of all questions within each research theme can be found in the Appendix. Percentages indicate the proportion of alumni who scored High on each factor, defined as 4.0-5.0 on a 5-point scale.
+
+\medskip
+\graphHead{Average Career Pathway Preparation}
+
+\ignore{ 
+### CP_12
+}
+
+`r Ig('CP_12.pdf')`
+
+\graphHead{Average Career Satisfaction}
+
+\ignore{ 
+### CS_12
+}
+
+`r Ig('CS_12.pdf')`
+
+\newpage
+
+\graphHead{Average Community Engagement}
+
+\ignore{ 
+### CE_13
+}
+
+`r Ig('CE_13.pdf')`
+
+\graphHead{Average Economic Mobility}
+
+\ignore{ 
+### EM_13
+}
+
+`r Ig('EM_13.pdf')`
+
+\graphHead{Average Institutional Career Investment}
+
+\ignore{ 
+### ICI_13
+}
+
+`r Ig('ICI_13.pdf')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 20cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/career-prep-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# CAREER PREPARATION
+}
+\section{CAREER PREPARATION }
+
+\newpage
+
+\ignore{ 
+## Career Advice
+}
+\subsection{CAREER ADVICE}
+
+The following tables display alumni responses to questions about career advice received during their time at your institution, compared to alumni at national institutions.
+
+\vspace{10pt}
+
+\tableHead{Did you receive career advice from your institution while you were there?}
+
+\ignore{ 
+### Q180_15
+}
+`r igBtab('Q180_15.pdf')`
+
+\tableHead{The career advice I received has been helpful.}
+
+\ignore{ 
+### Q184_15
+}
+`r igBtab('Q184_15.pdf')`
+
+\tableHead{The person at my institution who helped me the most with my career can be described as:}
+
+\ignore{ 
+### Q182_15
+}
+
+`r igTrim('Q182_15.pdf', '1.15in', '7.2in', '0.65in', '1.05in')`
+
+\newpage
+
+\tableHead{Did you receive career advice from any of the following? Select all that apply.}
+
+\medskip
+
+\ignore{ 
+### Q181_16
+}
+
+`r igTrim('Q181_16.pdf', '1.15in', '5.4in', '0.65in', '1.2in' )`
+
+\newpage
+
+\tableHead{The career advice I received from the following has been helpful.}
+
+\medskip
+
+\ignore{ 
+### Q186_192_16
+}
+
+`r igTrim('Q186_192_16.pdf', '1.15in', '5.4in', '0.65in', '1.2in')`
+
+\newpage
+
+\ignore{ 
+## Internship Experiences During Degree
+}
+\subsection{INTERNSHIP EXPERIENCES DURING DEGREE}
+
+The following tables display alumni responses to questions about internship or related experiences during their time at your institution, compared to alumni at  national institutions.
+
+\medskip
+
+\tableHead{Did you complete an internship or related experience while earning your degree?}
+
+\ignore{ 
+### Q389_17
+}
+`r igBtab('Q389_17.pdf')`
+
+\tableHead{The internship(s) or related experience(s) that I completed while earning my degree were related to my \emph{\underline{major}}.}
+\ignore{ 
+### Q106
+}
+`r igBtab('Q106_17.pdf')`
+
+\tableHead{The internship(s) or related experience(s) that I completed while earning my degree were related to my \emph{\underline{career goal at the time}}.}
+\ignore{ 
+### Q107
+}
+`r igBtab('Q107_17.pdf')`
+
+\newpage
+
+\tableHead{The internship(s) or related experience(s) that I completed while earning my degree were related to my  \emph{\underline{current career}}.}
+\ignore{ 
+### Q108
+}
+`r igBtab('Q108_18.pdf')`
+
+\newpage
+
+\ignore{ 
+## Career Pathway Preparation
+}
+\subsection{CAREER PATHWAY PREPARATION}
+
+\graphHead{Overall Average on Career Pathway Preparation}
+\ignore{ 
+### CP
+}
+`r Ig('CP_18.pdf')`
+
+\tableHead{My degree helped prepare me for my career.}
+\ignore{ 
+### Q17
+}
+`r igBtab('Q17_18.pdf')`
+
+\tableHead{I am satisfied with my degree educational experience.}
+\ignore{ 
+### Q18
+}
+`r igBtab('Q18_18.pdf')`
+
+\newpage
+
+\tableHead{My degree is worth the tuition I paid.}
+\ignore{ 
+### Q19
+}
+`r igBtab('Q19_19.pdf')`
+
+\tableHead{I was well prepared to begin my career when I graduated.}
+\ignore{ 
+### Q29
+}
+`r igBtab('Q29_19.pdf')`
+
+\tableHead{The degree I earned helped me get started in my career.}
+\ignore{ 
+### Q32
+}
+`r igBtab('Q32_19.pdf')`
+
+\newpage
+
+\ignore{ 
+## Institutional Career Investment
+}
+\subsection{INSTITUTIONAL CAREER INVESTMENT}
+
+\graphHead{Overall Average on Institutional Career Investment}
+\ignore{ 
+### ICI
+}
+`r Ig('ICI_20.pdf')`
+
+\tableHead{My institution helped me to understand career opportunities.}
+\ignore{ 
+### Q12
+}
+`r igBtab('Q12_20.pdf')`
+
+\tableHead{My institution helped me create a plan for my career.}
+\ignore{ 
+### Q13
+}
+`r igBtab('Q13_20.pdf')`
+
+\newpage
+
+\tableHead{My institution helped me envision my career options.}
+\ignore{ 
+### Q14
+}
+`r igBtab('Q14_20.pdf')`
+
+\tableHead{My institution helped me network with alumni.}
+\ignore{ 
+### Q22
+}
+`r igBtab('Q22_21.pdf')`
+
+\tableHead{My institution helped me network with employers.}
+\ignore{ 
+### Q21
+}
+`r igBtab('Q21_21.pdf')`
+
+\tableHead{My institution invested in my career.}
+\ignore{ 
+### Q30
+}
+`r igBtab('Q30_21.pdf')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 23cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/Career-experiences-since-graduation-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# CAREER EXPERIENCES SINCE GRADUATION
+}
+\section{CAREER EXPERIENCES SINCE GRADUATION }
+
+\newpage
+
+\ignore{ 
+## Application of Degree to current career
+}
+\subsection{APPLICATION OF DEGREE TO CURRENT CAREER }
+
+\tableHead{My current position is related to my major.}
+\ignore{ 
+### Q400
+}
+`r igBtab('Q400_23.pdf')`
+
+\tableHead{My current position requires me to use the skills I learned during my degree.}
+\ignore{ 
+### Q402
+}
+`r igBtab('Q402_23.pdf')`
+
+\tableHead{My current position is related to the career goal I had during my degree.}
+\ignore{ 
+### Q401
+}
+`r igBtab('Q401_23.pdf')`
+
+\newpage
+
+\ignore{ 
+## Career Experiences
+}
+\subsection{CAREER EXPERIENCES }
+
+The following tables display alumni responses to questions about career experiences since their time at your institution, compared to alumni at  national institutions. Percentages reflect the proportion of alumni who selected each type of experience in response to the question, 
+
+``Which of the following career experiences have you had since earning your degree? Select all that apply."
+
+\medskip
+
+\tableHead{Full-Time Employment}
+\ignore{ 
+### Q391_ft
+}
+`r igBtab('Q391_ft_24.pdf')`
+
+\tableHead{Part-Time Employment}
+\ignore{ 
+### Q391_pt
+}
+`r igBtab('Q391_pt_24.pdf')`
+
+\tableHead{Contract/Temporary Work}
+\ignore{ 
+### Q391_contract
+}
+`r igBtab('Q391_contract_24.pdf')`
+
+\tableHead{Internship or Similar Experience}
+\ignore{ 
+### Q391_intern
+}
+`r igBtab('Q391_intern_25.pdf')`
+
+\tableHead{Post-Grad Fellowship}
+\ignore{ 
+### Q391_postgrad
+}
+`r igBtab('Q391_postgrad_25.pdf')`
+
+\tableHead{Self-Employment}
+\ignore{ 
+### Q391_self
+}
+`r igBtab('Q391_self_25.pdf')`
+
+\tableHead{Founded a Company or Non-Profit}
+\ignore{ 
+### Q391_founder
+}
+`r igBtab('Q391_founder_25.pdf')`
+
+\tableHead{Earned Additional Degree(s)}
+\ignore{ 
+### Q391_degree
+}
+`r igBtab('Q391_degree_25.pdf')`
+
+\newpage
+
+\tableHead{Service Work}
+\ignore{ 
+### Q391_service
+}
+`r igBtab('Q391_service_26.pdf')`
+
+\tableHead{Military Service}
+\ignore{ 
+### Q391_military
+}
+`r igBtab('Q391_military_26.pdf')`
+
+\tableHead{Unemployed by Choice}
+\ignore{ 
+### Q391_unemployed
+}
+`r igBtab('Q391_unemployed_26.pdf')`
+
+\tableHead{Unemployed and Seeking}
+\ignore{ 
+### Q391_seeking
+}
+`r igBtab('Q391_seeking_26.pdf')`
+
+\newpage
+
+\ignore{ 
+## Career Growth and Stability
+}
+\subsection{CAREER GROWTH AND STABILITY }
+
+\tableHead{The first job I secured after my degree helped me pursue my career goals.}
+\ignore{ 
+### Q105
+}
+`r igBtab('Q105_28.pdf')`
+
+\tableHead{My current position is related to the career goal I have now..}
+\ignore{ 
+### Q403
+}
+`r igBtab('Q403_28.pdf')`
+
+\tableHead{My current position provides opportunities for further learning and skill development.}
+\ignore{ 
+### Q405
+}
+`r igBtab('Q405_28.pdf')`
+
+\tableHead{I am likely to retain my current employment until I choose to leave.}
+\ignore{ 
+### Q406
+}
+`r igBtab('Q406_28.pdf')`
+
+\newpage
+
+\tableHead{The work I do in my current position is meaningful to me.}
+\ignore{ 
+### Q404
+}
+`r igBtab('Q404_29.pdf')`
+
+\tableHead{Do you feel that you are underemployed?}
+\ignore{ 
+### Q407
+}
+`r igBtab('Q407_29.pdf')`
+
+\newpage
+
+\ignore{ 
+## Career Satisfaction
+}
+\subsection{CAREER SATISFACTION }
+
+\graphHead{Overall Average on Career Satisfaction.}
+\ignore{ 
+### CS
+}
+`r Ig('CS_29.pdf')`
+
+\tableHead{I am satisfied with my career so far.}
+\ignore{ 
+### Q8
+}
+`r igBtab('Q8_29.pdf')`
+
+\tableHead{I am satisfied with my current career.}
+\ignore{ 
+### Q9
+}
+`r igBtab('Q9_30.pdf')`
+
+\tableHead{I am satisfied with the level of responsibility of my current job.}
+\ignore{ 
+### Q10
+}
+`r igBtab('Q10_30.pdf')`
+
+\newpage
+
+\tableHead{I am content with the progression of my career.}
+\ignore{ 
+### Q11
+}
+`r igBtab('Q11_30.pdf')`
+
+\tableHead{I have advanced in my career as I had hoped.}
+\ignore{ 
+### Q24
+}
+`r igBtab('Q24_30.pdf')`
+
+\tableHead{My salary is enough to pay my bills every month.}
+\ignore{ 
+### Q31
+}
+`r igBtab('Q31_30.pdf')`
+
+\newpage
+
+\ignore{ 
+## Other Career Experiences Items
+}
+\subsection{OTHER CAREER EXPERIENCES ITEMS }
+
+\tableHead{I currently own my own business.}
+\ignore{ 
+### Q387
+}
+`r igBtab('Q387_31.pdf')`
+
+\tableHead{How did the COVID-19 pandemic impact your current job or career status?}
+\ignore{ 
+### Q372
+}
+
+`r igTrim('Q372_31.pdf', '1.15in', '7.2in', '0.65in', '1.05in')`
+
+\newpage
+
+\tableHead{How many distinct paid positions have you held since earning your degree?}
+\ignore{ 
+### Q390
+}
+
+`r igTrim('Q390_31.pdf', '1.15in', '6.6in', '0.65in', '1.05in')`
+
+\newpage
+
+\tableHead{Please select which of the following best represents when you felt decided about pursuing your current career path.}
+\ignore{ 
+### Q500
+}
+
+`r igTrim('Q500_32.pdf', '1.15in', '5.7in', '0.65in', '1.05in')`
+
+\newpage
+
+\tableHead{What job level best describes your current role?}
+\ignore{ 
+### Q123
+}
+
+`r igTrim('Q123_32.pdf', '1.15in', '6.6in', '0.65in', '1.05in')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 23cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/Learing-outcomes-and-experiences-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# LEARNING OUTCOMES & EXPERIENCES
+}
+\section{LEARNING OUTCOMES AND EXPERIENCES }
+
+\newpage
+
+\ignore{ 
+## Competencies
+}
+\subsection{COMPETENCIES }
+
+The following charts display average alumni-reported competency scores for your campus compared to  U.S. institutions. Percentages reflect the percent of alumni who responded Agree or Strongly agree (4 or 5 on a 5-point scale) to items about competencies gained during their degrees.
+
+`r igTrim('Overall_35.pdf', '1.05in', '5.2in', '0.6in', '1in')`
+`r igTrim(paste0(grad_year1,'_35.pdf'), '1.05in', '5in', '0.6in', '1in')`
+`r igTrim(paste0(grad_year2,'_35.pdf'), '1.05in', '5in', '0.6in', '1in')`
+
+\newpage
+
+\ignore{ 
+## From the NSSE High Impact Educational Practices
+}
+\subsection{FROM THE NSSE HIGH IMPACT EDUCATIONAL PRACTICES }
+
+The following charts display average alumni-reported high impact educational practice scores for your campus compared to  U.S. institutions. Percentages reflect the percent of alumni who indicated that they participated in each activity during their degrees.
+
+\ignore{ 
+### Q254
+}
+
+`r igTrim('Overall_37.pdf', '1.05in', '4in', '0.6in', '1in')`
+`r igTrim(paste0(grad_year1,'_37.pdf'), '1.05in', '4in', '0.6in', '1in')`
+`r igTrim(paste0(grad_year2,'_37.pdf'), '1.05in', '4in', '0.6in', '1in')`
+
+\newpage
+
+\ignore{ 
+## Community Engagement
+}
+\subsection{COMMUNITY ENGAGEMENT }
+
+\graphHead{Overall Average on Community Engagement}
+\ignore{ 
+### CE
+}
+`r Ig('CE_40.pdf')`
+
+\tableHead{I am involved in my community.}
+\ignore{ 
+### Q20
+}
+`r igBtab('Q20_40.pdf')`
+
+\tableHead{I have received recognition for my community involvement.}
+\ignore{ 
+### Q25
+}
+`r igBtab('Q25_40.pdf')`
+
+\tableHead{I regularly donate money to charitable causes.}
+\ignore{ 
+### Q23
+}
+`r igBtab('Q23_40.pdf')`
+
+\newpage
+
+\tableHead{I regularly donate time to charitable causes.}
+\ignore{ 
+### Q26
+}
+`r igBtab('Q26_41.pdf')`
+
+\tableHead{I volunteer in my community regularly.}
+\ignore{ 
+### Q28
+}
+`r igBtab('Q28_41.pdf')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 23cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/Return-on-investment-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# RETURN ON INVESTMENT
+}
+\section{RETURN ON INVESTMENT }
+
+\newpage
+
+\ignore{ 
+## Motivation for Degree
+}
+
+\subsection{MOTIVATION FOR DEGREE}
+
+\tableHead{What were the top 3 motivations for choosing to pursue a degree?}
+\ignore{ 
+### Q110
+}
+
+`r igTrim('Q110_43.pdf', '1.05in', '2.3in', '0.6in', '1.1in')`
+
+\ignore{ 
+## Economic Mobility
+}
+\subsection{ECONOMIC MOBILITY}
+
+\graphHead{Overall Average on Economic Mobility}
+\ignore{ 
+### EM
+}
+`r Ig('EM_44.pdf')`
+
+\tableHead{I currently earn a higher income than the household in which I grew up.}
+\ignore{ 
+### Q33
+}
+`r igBtab('Q33_44.pdf')`
+
+\tableHead{I expect to earn more in the future than the household in which I grew up.}
+\ignore{ 
+### Q27
+}
+`r igBtab('Q27_44.pdf')`
+
+\tableHead{My earning potential is higher than the house in which I grew up.}
+\ignore{ 
+### Q16
+}
+`r igBtab('Q16_44.pdf')`
+
+\ignore{ 
+## Student Loan Debt
+}
+\subsection{STUDENT LOAN DEBT}
+
+The following tables display alumni responses to questions about debt incurred for their degree at your institution, compared to alumni at  national institutions.
+
+\tableHead{Did you incur debt while you were earning your degree?}
+\ignore{ 
+### Q415
+}
+`r igBtab('Q415_45.pdf')`
+
+\tableHead{Did anyone other than you incur debt for your degree?}
+\ignore{ 
+### Q416
+}
+`r igBtab('Q416_45.pdf')`
+
+\tableHead{Are you still paying debt from your degree?}
+\ignore{ 
+### Q417
+}
+`r igBtab('Q417_45.pdf')`
+
+\tableHead{My student debt is overwhelming.}
+\ignore{ 
+### Q421
+}
+`r igBtab('Q421_46.pdf')`
+
+\newpage
+
+\tableHead{My degree was worth my student loan debt.}
+\ignore{ 
+### Q420
+}
+`r igBtab('Q420_46.pdf')`
+
+\tableHead{My student loan debt has been manageable.}
+\ignore{ 
+### Q419
+}
+`r igBtab('Q419_46.pdf')`
+
+\newpage
+
+\begin{tikzpicture}[remember picture,overlay,shift={(current page.north)}]
+\node[rectangle,
+    anchor=north,xshift=0cm,yshift=-1.9in,
+    minimum width = 23cm,
+    minimum height = 1.8cm] (r) at (0,0) {
+    \includegraphics[width = \textwidth]{images/Equity-insights-low.jpg}
+    };
+\end{tikzpicture}
+
+\ignore{ 
+# EQUITY INSIGHT
+}
+\section{EQUITY INSIGHT }
+
+\newpage
+
+\ignore{ 
+## Equity and Career Mobility
+}
+
+\subsection{EQUITY AND CAREER MOBILITY}
+
+Equity insights are provided in this section for each of the six High Impact Career Mobility Practices: helpful career advice, employer connections, career-related internships, career plans, career opportunities, and critical thinking skills. Each of these items is broken down, when possible due to sample size, by gender identity, sexual identity, race, disability, and first-generation status. 
+
+\medskip
+
+Groups with fewer than five individuals were combined to conduct more robust analyses and to protect the privacy of individuals. If combined groups for a demographic still did not meet the criterion of five responses, the analysis is not included in this report.
+
+\newpage
+
+\ignore{
+## Helpful Career Advice by Demographics
+}
+
+\subsection{HELPFUL CAREER ADVICE BY DEMOGRAPHIC}
+
+This section shows the distribution of responses to the item, "The career advice I received has been helpful." Groups with fewer than five responses to this question are combined. 
+
+\vspace{5pt}
+
+\ignore{
+### Q184
+}
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q184_Q142_49.pdf')`
+\vspace{8pt}
+`r igTest('Q184_Q153_49.pdf')`
+\vspace{8pt}
+`r igTest('Q184_Q150_49.pdf')`
+\vspace{8pt}
+`r igTest('Q184_Q148_49.pdf')`
+\vspace{8pt}
+`r igTest('Q184_Q154_49.pdf')`
+
+\newpage
+
+\ignore{
+## Employer Connections by Demographics
+}
+
+\subsection{EMPLOYER CONNECTIONS BY DEMOGRAPHIC}
+
+Below, find the distribution of alumni responses to the item, "My institution helped me to network with employers." Categories with fewer than five individuals are combined.
+
+\vspace{5pt}
+
+\ignore{
+### Q21
+}
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q21_Q142_50.pdf')`
+\vspace{8pt}
+`r igTest('Q21_Q153_50.pdf')`
+\vspace{8pt}
+`r igTest('Q21_Q150_50.pdf')`
+\vspace{8pt}
+`r igTest('Q21_Q148_50.pdf')`
+\vspace{8pt}
+`r igTest('Q21_Q154_50.pdf')`
+
+\newpage
+
+\ignore{
+## Career-related Internships by demographics
+}
+
+\subsection{CAREER-RELATED INTERNSHIPS BY DEMOGRAPHIC}
+
+Below, find the distribution of alumni responses to the item, "The internship(s) or related experience(s) that I completed while earning my degree were related to my current career." Categories with fewer than five individuals are combined. 
+
+\vspace{5pt}
+
+\ignore{
+### Q108
+}
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q108_Q142_51.pdf')`
+\vspace{8pt}
+`r igTest('Q108_Q153_51.pdf')`
+\vspace{8pt}
+`r igTest('Q108_Q150_51.pdf')`
+\vspace{8pt}
+`r igTest('Q108_Q148_51.pdf')`
+\vspace{8pt}
+`r igTest('Q108_Q154_51.pdf')`
+
+\newpage
+
+\ignore{
+## Career Plans by Demographic
+}
+\subsection{CAREER PLANS BY DEMOGRAPHIC}
+
+Below is the distribution of alumni responses to the item, "My institution helped me create a plan for my career." Categories with fewer than five individuals are combined. 
+
+\vspace{5pt}
+
+\ignore{
+### Q13
+}
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q13_Q142_52.pdf')`
+\vspace{8pt}
+`r igTest('Q13_Q153_52.pdf')`
+\vspace{8pt}
+`r igTest('Q13_Q150_52.pdf')`
+\vspace{8pt}
+`r igTest('Q13_Q148_52.pdf')`
+\vspace{8pt}
+`r igTest('Q13_Q154_52.pdf')`
+
+\newpage
+
+\ignore{
+## Career Opportunities by Demographic
+}
+\subsection{CAREER OPPORTUNITIES BY DEMOGRAPHIC}
+
+Below is the distribution of alumni responses to the item, "My institution helped me to understand career opportunities." Categories with fewer than five individuals are combined. 
+
+\vspace{5pt}
+
+\ignore{
+### Q12
+}
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q12_Q142_53.pdf')`
+\vspace{8pt}
+`r igTest('Q12_Q153_53.pdf')`
+\vspace{8pt}
+`r igTest('Q12_Q150_53.pdf')`
+\vspace{8pt}
+`r igTest('Q12_Q148_53.pdf')`
+\vspace{8pt}
+`r igTest('Q12_Q154_53.pdf')`
+
+\newpage
+
+\ignore{
+## Critical Thinking Skills by Demographics
+}
+\subsection{CRITICAL THINKING SKILLS BY DEMOGRAPHIC}
+
+Below is the distribution of alumni responses to the item, "My institution helped me to understand career opportunities." Categories with fewer than five individuals are combined. 
+
+\vspace{5pt}
+
+\ignore{
+### Q319
+}
+
+
+\vspace{8pt}
+`r igTest('demo_legend.pdf')`
+\vspace{8pt}
+`r igTest('Q319_Q142_54.pdf')`
+\vspace{8pt}
+`r igTest('Q319_Q153_54.pdf')`
+\vspace{8pt}
+`r igTest('Q319_Q150_54.pdf')`
+\vspace{8pt}
+`r igTest('Q319_Q148_54.pdf')`
+\vspace{8pt}
+`r igTest('Q319_Q154_54.pdf')`
+
+\newpage
+
+\ignore{ 
+# Recommendations 
+}
+\urlstyle{same}
+
+\def\shortTitle{TRUE}
+\section{RECOMMENDATIONS}
+
+After assessing your NACM survey results, The Career Leadership Collective recommends the following for your campus: 
+
+\ignore{ 
+## What you can do next
+}
+\subsection*{WHAT YOU CAN DO NEXT}
+
+\begin{enumerate}
+\item EDUCATE YOUR CAMPUS: Create your slide deck and 7-minute video overview of the results to share across campus.
+
+\item SHARE SUCCESSES EXTERNALLY: Embed successes from the findings into your External Career Outcomes webpage. See an example here: \href{https://www.careerleadershipcollective.com/outcomes-example}{https://www.careerlead} 
+\href{https://www.careerleadershipcollective.com/outcomes-example}{ershipcollective.com/outcomes-example} 
+
+\item ADAPT YOUR PRACTICES: You have incredible insights about how you can adapt your practices toward a high likelihood of career mobility for your alumni. We encourage you to gather a campus working group to discuss how you can embed high impact career practices across the campus. 
+
+\end{enumerate}
+
+\ignore{ 
+## How We Can Help your Campus Use your Results
+}
+
+\subsection*{HOW WE CAN HELP YOUR CAMPUS USE YOUR RESULTS}
+
+\begin{enumerate}
+\item	STAKEHOLDER PRESENTATION ON NACM DATA: The Collective staff are available to provide a virtual presentation of your NACM results to key stakeholders. For example, presentation of NACM highlights to your President’s cabinet, Board of Trustees, Deans, etc.
+\item	FURTHER DATA ANALYSIS OR VISUALIZATION CONSULTING: The Collective can provide consultation on strategic use of your data, including providing additional analytics to help you effectively tell a story with your data, and decide which data to display on external or public websites. For example, combining additional institutional data on interactions with your career center or engagement with high impact practices while a student, combining with FDS data, or digging deeper into demographics or peer comparisons.
+\item	HIGH IMPACT CAREER MOBILITY PRACTICE CONSULTING: The Collective can provide consulting services that use your NACM and First Destination Survey results to help university leaders weave career development into the fabric of campus experience. For example, leveraging NACM data to help transform the co-curricular experience of students, such as student employment or residence life programming. In addition, NACM data consulting can help analyze curricular areas of success and areas of improvement, by individual colleges, academic units, and areas of study. 
+\item	FDS OUTCOMES: The Collective team can assist your campus by handling your First Destination Survey with EMBARK: FDS Services. Learn more at \url{https://www.careerleadershipcollective.com/embark} 
+\end{enumerate}
+
+\ignore{ 
+# Methodology 
+}
+
+\section{METHODOLOGY}
+
+The Career Leadership Collective created the National Alumni Career Mobility Survey (NACM) to assess the career pathways of US college and university alumni more effectively. 
+
+The specific goal of the assessment is to better understand multiple areas of interest: educational satisfaction, career pathways, career satisfaction, economic mobility, and community engagement.  
+
+NACM was developed in response to many years of listening to higher education administrators who recognized the lack of data about their graduates. 
+
+\begin{itemize}
+\item A targeted needs assessment began in January of 2018 and continued over the course of eight months as the consultants with The Career Leadership Collective solicited feedback from college and university administrators across the United States. 
+\item	An initial instrument was drafted in September of 2018 using data from formal listening sessions.  
+\item	Face validity of NACM was established at a national convening in March 2019 where administrators and career leaders from 25 public and private colleges and universities came together to review, edit, and refine the instrument. 
+\item	Item analysis after two subsequent pilot administrations established statistical validity of multiple constructs addressing the areas of interest. 
+\item	Care was taken to ensure that the instrument includes items critical to understanding graduates' educational experiences and competency outcomes, in addition to the formal constructs. 
+\end{itemize}
+
+\newpage
+
+\ignore{
+## Five Core Research Dimensions
+}
+\subsection*{FIVE CORE RESEARCH DIMENSIONS}
+
+NACM views career success and mobility through a multi-dimensional lens that includes five core areas.
+
+\begin{enumerate}
+\item	\textbf{CAREER SATISFACTION}: Career purpose, preparation, aspirations, responsibility, and enthusiasm.
+\item	\textbf{CAREER PATHWAY PREPARATION}: Number and type of jobs, industries, geography, graduate school, and internships during and after graduation. 
+\item	\textbf{ECONOMIC MOBILITY}: Salary growth, loan debt, family income while growing up, current salary range, and institutional investment. 
+\item	\textbf{INSTITUTIONAL CAREER INVESTMENT}: Marketability of the major, career mentoring, career preparation, and affinity.
+\item	\textbf{COMMUNITY ENGAGEMENT}: Community involvement, philanthropy, and recognitions.
+\end{enumerate}
+
+\ignore{
+## Additional Campus Engagement Themes
+}
+
+\subsection*{ADDITIONAL CAMPUS ENGAGEMENT THEMES}
+
+NACM also assesses areas of campus engagement through the duration of a degree program, how each area correlates with the five core research themes, and how each is associated with overall career success.
+
+\begin{itemize}
+\item	\textbf{CAREER ADVICE}: The presence, effectiveness, and mode of career advice.
+\item	\textbf{CAREER EXPERIENCES}: The presence, effectiveness, and mode of hands-on career experiences such as internships and research projects.
+\item	\textbf{ENGAGEMENT WITH EMPLOYERS}: Engagement level with employers.
+\item	\textbf{ENGAGEMENT WITH ALUMNI}: Engagement level with alumni. 
+\item	\textbf{COMPETENCY DEVELOPMENT}: Development of competencies, which include the NACE competencies, some of the World Economic Forum’s Future of Jobs Report competencies, and the AAC\&U / Hart Research competencies. 
+\item	\textbf{HIGH IMPACT EDUCATIONAL PRACTICES}: Engagement in high impact educational practices as defined by the AAC\&U. 
+\end{itemize}
+
+\newpage
+
+\ignore{
+## Overview of the Career Mobility Index
+}
+
+\color{hex1} \fontsize{16}{16} \textbf{OVERVIEW OF THE CAREER MOBILITY INDEX} \color{black}
+
+\bigskip
+
+The High Impact Career Mobility Index™ (CMI) was created from NACM data to understand which campus practices are most likely to influence the career mobility of students and alumni over the first 10 years of their career post-graduation. Career Mobility is defined as a combination of career pathway preparation, career satisfaction, and economic mobility. 
+
+\medskip
+\medskip
+\medskip
+
+\includegraphics[width = \textwidth]{images/CMI-picto.png}
+
+\medskip
+\medskip
+\medskip
+
+There are fourteen variables represented in the three specific research domains which look at alumni success related to: 1. Possessing the skills to do quality work, 2. Being happy in a career, and 3. Feeling financially stable and satisfied. The make-up of each of the three research domains of the CMI can best be described as follows: 
+
+\begin{itemize}
+\item	Career Pathway Preparation: Educational impact on preparedness prior to starting their career, the beginning of their career, career advancement, and preparedness for current job.
+\item	Career Satisfaction: Educational impact on satisfaction with their whole career, which includes progression of career, career so far, current career, and level of responsibility in current job.
+\item	Economic Mobility: Educational impact on earning history, trajectory, potential, satisfaction, and comparison to the household in which they grew-up.
+\end{itemize}
+
+\newpage
+
+\ignore{
+# Appendix
+}
+
+\section{APPENDIX}
+
+\ignore{
+## Demographics
+}
+
+\subsection{DEMOGRAPHICS}
+\bigskip
+
+\newcommand\Perc{\%}
+\newcommand\RA{$\Rightarrow$}
+\renewcommand{\arraystretch}{1.2}
+
+```{r}
+displ_demo <- function(x){
+  
+  dd <- report_data %>% 
+    filter(Institution == instit) %>%
+    filter(FieldID == x) %>% 
+    mutate(' ' = "\\RA",
+           Value = paste0(Value, '\\Perc'),
+           AnswerFields = ifelse(FieldID == 'Q143', 
+                                 AnswerFields, 
+                                 str_replace(AnswerFields, '\\([^()]*\\)', '')
+                                 )
+    )
+  
+  if(x != 'GradYear'){
+    dd <- dd %>% filter(GradYear == 'Overall')
+  }
+  if(x == 'Q143'){
+    dd <- dd %>% mutate(AnswerFields = factor(AnswerFields, 
+                                              levels = c('Traditional Age (17-24)',
+                                                         'Adult Student (25 or older)',
+                                                         'Prefer not to respond',
+                                                         'Yes',
+                                                         'No'))) %>%
+                arrange(AnswerFields)
+  }
+  if(x %in% c('Q142','Q152', 'Q150', 'Q153')){
+    entries <- unique(dd$AnswerFields)
+    entries <- entries[!is.na(entries)]
+    main_entries <- entries[!entries %in% c('Another identity not listed here',
+                                             'Prefer not to respond', 
+                                             'None of the above')]
+    clean_entries <- c(main_entries, 
+                       'Another identity not listed here', 
+                       'None of the above', 
+                       'Prefer not to respond')
+    
+    dd <- dd %>% 
+            mutate(AnswerFields = factor(AnswerFields,
+                                         levels = clean_entries)) %>%
+            filter(AnswerFields %in% clean_entries) %>%
+            arrange(AnswerFields)
+  }
+  if(x %in% c('Q148','Q154', 'Q200')){
+    dd <- dd %>% mutate(AnswerFields = factor(AnswerFields,
+                                              levels = c('Yes', 'No', 'Prefer not to respond'))) %>%
+                arrange(AnswerFields)
+  }
+  
+  
+  
+  dd <- dd %>% select(' ', Value, AnswerFields)
+  
+  return(
+    dd %>%
+      kable('latex',
+            col.names = NULL,
+            booktabs = T,
+            bottomrule = '',
+            toprule = '',
+            midrule = '',
+            escape = F,
+            align = c("p{0.5cm}","p{1cm}","p{5cm}"))
+  )
+}
+```
+
+\normalsize
+
+\begin{minipage}[t]{0.45\textwidth}
+
+\textbf{Graduation Year}
+\bigskip
+
+```{r}
+displ_demo('GradYear')
+```
+
+\bigskip
+\textbf{What best describes your age when you were obtaining this degree?}
+\bigskip
+
+```{r}
+displ_demo('Q143')
+```
+
+\bigskip
+\textbf{What is your current gender identity? }
+\medskip
+
+```{r}
+displ_demo('Q142')
+```
+
+\bigskip
+\textbf{Do you identify as cisgender or transgender?}
+\bigskip
+
+```{r}
+displ_demo('Q152')
+```
+
+ 
+ 
+\end{minipage}\begin{minipage}{0.10\textwidth}
+~
+\end{minipage} \begin{minipage}[t]{0.45\textwidth}
+
+\textbf{Were you a first-generation college student during your degree?} 
+\bigskip
+
+```{r}
+displ_demo('Q148')
+```
+
+\bigskip
+\textbf{With which race(s) do you self-identify?} 
+\bigskip
+
+```{r}
+displ_demo('Q150')
+```
+
+\bigskip
+\textbf{What was your status while earning your degree?} 
+\bigskip
+
+```{r}
+displ_demo('Q146')
+```
+
+\end{minipage}
+
+\newpage
+
+\begin{minipage}[t]{0.45\textwidth}
+
+\textbf{Do you identify as a person with a disability?} 
+\bigskip
+
+```{r}
+displ_demo('Q154')
+```
+
+\bigskip
+\textbf{What is your sexual identity?} 
+\bigskip
+
+```{r}
+displ_demo('Q153')
+```
+
+\end{minipage}\begin{minipage}{0.10\textwidth}
+~
+\end{minipage} \begin{minipage}[t]{0.45\textwidth}
+
+\textbf{Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?} 
+\bigskip
+
+```{r}
+displ_demo('Q200')
+```
+
+\bigskip
+\textbf{Since graduating with your degree, how many years have you lived in the same state where your institution is located? } 
+\bigskip
+
+```{r}
+displ_demo('Q147')
+```
+
+\end{minipage}
+
+\newpage
+
+\ignore{
+## Last Page
+}
+
+\null
+\vfill
+
+\begin{center}
+\includegraphics[width = 0.6\textwidth]{images/CLC-blue-high.png}
+\end{center}
+
+\vfill
+
+
+
+
+
+
+
+
+
+

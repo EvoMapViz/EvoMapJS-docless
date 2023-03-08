@@ -1,0 +1,33 @@
+#size-legend {
+    margin-top: 0 auto;
+    display: table;
+    overflow: 'visible';
+}
+.legend-circle {
+    fill: none;
+    stroke: #000;
+}
+.legend-dotted-line {
+  stroke: #000;
+  stroke-dasharray: 2, 2;
+  shape-rendering: crispEdges;
+}
+.legend-number {
+  font-size: .7em;
+}
+
+.legend-svg-container {
+  /* display: inline-block; */
+/*   position: relative;
+  width: 100%;
+  height: 30%; */
+  /* vertical-align: top; */
+}
+
+.legend-svg-content-responsive{
+  /* display: inline-block; */
+  /* vertical-align: top; */
+  /* position: relative; */
+  /* top: 10px; */
+  /* left: 0; */
+}

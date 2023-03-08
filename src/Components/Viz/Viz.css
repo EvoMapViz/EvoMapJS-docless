@@ -1,0 +1,19 @@
+.viz {
+   width: 100%;
+   height: 100%;
+   display: flex;
+}
+
+@media screen and (max-width: 1134px) {
+   .viz {
+      width: 100%;
+      aspect-ratio : 1 / 1;
+      display: flex;
+   }
+ }
+ 
+
+.legend-column{
+   pointer-events: none; /* Avoids zoom and snap button to be unpointable in resolutions where overlap with legend-colum */
+                         /* Compensated by "pointer-events: auto" in ColorLegend.css to allow colgroup selection */
+} 

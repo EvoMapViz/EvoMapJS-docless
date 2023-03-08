@@ -1,0 +1,16 @@
+source('./src/auto_report.R')
+
+auto_report(
+            institutions = c('-', 'Northwestern Kellogg School of Management'),
+            # institutions = c('-', 'Northwestern Kellogg School of Management',
+            #                        'Colorado State University Pueblo',           # Data problem around Q184_Q142_49, at least in Pueblo GRAD, but maybe in Global Campus too
+            #                         'University of North Carolina Chapel Hill'), # Missing cover
+            # start_with_instit = 'Seattle University',
+            update_data = F,
+            # update_report = F,
+            update_figs_and_tabs = F,
+            # test = T,
+            this_year = 2022,
+            this_grad_year1 = '2012',
+            this_grad_year2 = '2017'
+            )

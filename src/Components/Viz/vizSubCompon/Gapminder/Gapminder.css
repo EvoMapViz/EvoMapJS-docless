@@ -1,0 +1,130 @@
+.svg-container {
+    width: 78vh;
+    overflow: 'visible'; /* For possiby overflowing tooltip */
+}
+
+.svg-content-responsive{
+    overflow: 'visible';
+    pointer-events: auto !important; /* Counters effect of pointer-events: none on foreground so it only applies to the foreground div and not to the svg components of the div */
+}
+
+.back-fore {
+    display: flex; /* required */
+    flex-flow: row nowrap; /* required */
+}
+.back-fore .background,
+.back-fore .foreground {
+    box-sizing: border-box; /* required */
+    width: 100%; /* required */
+    flex: none; /* required */
+}
+.back-fore .foreground {
+    margin-left: -100%; /* required */
+    pointer-events: none;
+}
+
+
+/* Tooltip */
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 130px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: rgb(247, 247, 247);
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+
+  .tool_head {
+    display: block; 
+    font-weight: bold;
+    font-size: 9px;
+    margin-top: 1em; 
+    margin-bottom: 0em; 
+    margin-left: 0; 
+    margin-right: 0; 
+ }
+
+.grid-container {
+    display: grid;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: inline-grid;
+    grid-column-gap: 5px;
+    grid-template-columns: 60px 60px;
+    font-size: 0.85em;
+    justify-content: center;
+ }
+
+ .grid-item{
+    padding-bottom: 4px;
+    padding-top: 7px;
+    font-size: 0.85;
+    justify-content: center;
+}
+
+.grid-last-item{
+    padding-top: 0px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    font-size: 0.85;
+    text-align: center
+}
+
+.circle-firm  {
+    stroke-width: 1px; /* desired stroke width (line height) */
+    vector-effect: non-scaling-stroke;  /* line height won't scale */
+    cursor: pointer;
+}
+
+.trace  {
+    stroke-width: 1px; /* desired stroke width (line height) */
+    vector-effect: non-scaling-stroke;  /* line height won't scale */
+}
+
+/* Button */
+
+.button rect {
+    stroke: #4a4a4a; 
+    stroke-width: 2px;
+    fill: #FFF; 
+  }
+
+.button-mousedover {
+    stroke: #4a4a4a !important; 
+    fill: #f1f1f1 !important; 
+    cursor: pointer !important;
+}
+
+.button-mousedout {
+    stroke: #4a4a4a !important;  
+    fill: #FFF; 
+}
+
+.button-clicked{
+    fill: #e2e2e2 !important; 
+    transition: fill 0.2s;
+}
+
+.button-baseline{
+    fill: #FFF !important; 
+    transition: fill 0.2s;
+}
+
+.button text {
+    font-size: 18px;
+    fill: #4a4a4a;
+    pointer-events: none;
+    text-anchor: middle;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.firmLabel {
+    pointer-events: none
+}
+

@@ -1,0 +1,19 @@
+.color-legend-svg-container {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  overflow-y: auto;
+  pointer-events: auto; 
+  /* Compensates for "pointer-events: none" on Legend Column in Viz.css */
+  /* The latter avoids zoom and snap button to be unpointable in resolutions where overlap with legend-colum */
+}
+
+.color-legend-svg-content-responsive{
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  top: 10px;
+  left: 0;
+  font-size: 22px;
+  overflow-y: auto;
+}

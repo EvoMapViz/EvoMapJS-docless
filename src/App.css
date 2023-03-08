@@ -1,0 +1,78 @@
+html, body {
+    font-size: 14px
+    }
+
+.box {
+    display: flex;
+    padding: 0;
+    margin:0;
+    flex-flow: column;
+    height: 100vh;
+}
+
+@media screen and (max-width: 1134px) {
+    .box {
+        display: flex;
+        padding-left: 0;
+        margin:0;
+        flex-flow: column;
+        height: auto;
+    }
+ }
+
+.box .row.header {
+    flex: 0 1 auto;
+    margin-bottom: 15px;
+  }
+  
+.box .row.content {
+display: flex;
+flex-flow: column;
+flex: 1 1 auto;
+overflow-y: auto;
+}
+
+.box .row.footer {
+flex: 0 1 40px;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.select__control{
+    cursor: pointer !important;
+}
+
+text {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+p {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; 
+}
