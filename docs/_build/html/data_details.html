@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+
+<html lang="English">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Data requirements: Details and effects on visualization &#8212; evomapjs 2023 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="data-requirements-details-and-effects-on-visualization">
+<h1>Data requirements: Details and effects on visualization<a class="headerlink" href="#data-requirements-details-and-effects-on-visualization" title="Permalink to this heading">¶</a></h1>
+<p>(Click on triangles to expand/collapse details about each file.)</p>
+<details closed>
+<summary style = "font-size: 17px; font-weight: bold"> 
+circles.json 
+</summary>
+<p>
+<p>Key-value pairs (each row):
+<br /></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (required): the name of the unit corresponding to the observation.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">time</span></code> (required): the time period for the observation.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any integer.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code> (required): the x coordinate of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any number.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">y</span></code>(required): the y coordinate of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any number.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">continuous_feature_1</span></code> (optional): a continuous feature of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string or number.</p></li>
+</ul>
+<p>⋮</p>
+<p><code class="docutils literal notranslate"><span class="pre">continuous_feature_c</span></code> (optional): a continuous feature of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string or number.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">discrete_feature_1</span></code> (optional): a discrete feature of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string or number.</p></li>
+</ul>
+<p>⋮</p>
+<p><code class="docutils literal notranslate"><span class="pre">discrete_feature_d</span></code> (optional): a discrete feature of the unit at <code class="docutils literal notranslate"><span class="pre">time</span></code>.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string or number.</p></li>
+</ul>
+</div></blockquote>
+<br />
+Further requirements and info: 
+<ul class="simple">
+<li><p>Each row <em>must</em> contain the full exact same set of keys, including <strong>at least one</strong> continuous feature (on top of the required <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>, and <code class="docutils literal notranslate"><span class="pre">y</span></code> keys).</p></li>
+<li><p>Whether a feature is considered &quot;continuous&quot; or &quot;discrete&quot; is specified through <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code>.</p>
+<ul>
+<li><p>Features marked as &quot;continuous&quot; in <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code> must be numerical.</p></li>
+<li><p>Features marked as &quot;discrete&quot; in <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code> will be treated as categorical, even if they are supplied in a numerical format.</p>
+<ul>
+<li><p>Inconsistent types for &quot;discrete&quot; features has not been tested.
+It's safest to have a single discrete feature be either all strings or all numericals across all rows.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Missing time periods are allowed and are signaled by the <em>complete</em> absence of an row for that time period.</p>
+<ul>
+<li><p>As indicated above, each object <em>must</em> contain the exact same set of keys.The app does not allow for &quot;partially missing&quot; time periods whereby a row  features missing keys or keys otherwise marked as <code class="docutils literal notranslate"><span class="pre">NA</span></code>, <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, <code class="docutils literal notranslate"><span class="pre">null</span></code>,....</p></li>
+</ul>
+</li>
+<li><p>The order of rows and key-value pairs within rows is irrelevant.</p></li>
+</ul>
+<br />
+ Prototype of valid format: 
+<br />
+<br />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;1ST SOURCE CORP&quot;</span><span class="p">,</span><span class="s2">&quot;time&quot;</span><span class="p">:</span><span class="mi">1998</span><span class="p">,</span><span class="s2">&quot;mkvalt&quot;</span><span class="p">:</span><span class="mf">0.58</span><span class="p">,</span><span class="s2">&quot;sic_code&quot;</span><span class="p">:</span><span class="s2">&quot;60&quot;</span><span class="p">,</span><span class="s2">&quot;x&quot;</span><span class="p">:</span><span class="mf">6.4079211884</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">:</span><span class="mf">13.0098593574</span><span class="p">,</span><span class="s2">&quot;cluster&quot;</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="s2">&quot;sic_code_label&quot;</span><span class="p">:</span><span class="s2">&quot;Depository Institutions&quot;</span><span class="p">,</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">:</span><span class="s2">&quot;Banking&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;1ST SOURCE CORP&quot;</span><span class="p">,</span><span class="s2">&quot;time&quot;</span><span class="p">:</span><span class="mi">1999</span><span class="p">,</span><span class="s2">&quot;mkvalt&quot;</span><span class="p">:</span><span class="mf">0.48</span><span class="p">,</span><span class="s2">&quot;sic_code&quot;</span><span class="p">:</span><span class="s2">&quot;60&quot;</span><span class="p">,</span><span class="s2">&quot;x&quot;</span><span class="p">:</span><span class="mf">6.4444474746</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">:</span><span class="mf">13.0361878325</span><span class="p">,</span><span class="s2">&quot;cluster&quot;</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="s2">&quot;sic_code_label&quot;</span><span class="p">:</span><span class="s2">&quot;Depository Institutions&quot;</span><span class="p">,</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">:</span><span class="s2">&quot;Banking&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;PIONEER NATURAL RESOURCES CO&quot;</span><span class="p">,</span><span class="s2">&quot;time&quot;</span><span class="p">:</span><span class="mi">2000</span><span class="p">,</span><span class="s2">&quot;mkvalt&quot;</span><span class="p">:</span><span class="mf">1.94</span><span class="p">,</span><span class="s2">&quot;rank&quot;</span><span class="p">:</span><span class="mf">288.0</span><span class="p">,</span><span class="s2">&quot;sic_code&quot;</span><span class="p">:</span><span class="s2">&quot;13&quot;</span><span class="p">,</span><span class="s2">&quot;x&quot;</span><span class="p">:</span><span class="mf">6.8169413341</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">:</span><span class="mf">3.6371516382</span><span class="p">,</span><span class="s2">&quot;cluster&quot;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;sic_code_label&quot;</span><span class="p">:</span><span class="s2">&quot;Oil and Gas Extraction&quot;</span><span class="p">,</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">:</span><span class="s2">&quot;Oil, Energy and Utilities&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span><span class="mi">1999</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;PIONEER NATURAL RESOURCES CO&quot;</span><span class="p">,</span> <span class="s2">&quot;mkvalt&quot;</span><span class="p">:</span><span class="mf">0.9</span><span class="p">,</span><span class="s2">&quot;rank&quot;</span><span class="p">:</span><span class="mf">417.0</span><span class="p">,</span><span class="s2">&quot;sic_code&quot;</span><span class="p">:</span><span class="s2">&quot;13&quot;</span><span class="p">,</span><span class="s2">&quot;x&quot;</span><span class="p">:</span><span class="mf">6.8474968473</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">:</span><span class="mf">3.6536847176</span><span class="p">,</span><span class="s2">&quot;cluster&quot;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;sic_code_label&quot;</span><span class="p">:</span><span class="s2">&quot;Oil and Gas Extraction&quot;</span><span class="p">,</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">:</span><span class="s2">&quot;Oil, Energy and Utilities&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>For a full example of the data format, see <code class="docutils literal notranslate"><span class="pre">src/data/circles_TEMPLATE_DO_NOT_ERASE.json</span></code> in this repository.</p>
+<ul class="simple">
+<li><p>This is a reference template that should <em>not</em> be erased.
+You should copy it, rename it to <code class="docutils literal notranslate"><span class="pre">circles.json</span></code>, and experiment with editing the latter with your own data (you can always revert to the template if you break the data format and want a fresh start).</p></li>
+</ul>
+</p>
+</details>
+<details closed>
+<summary style = "font-size: 17px; font-weight: bold"> 
+metadata.json
+</summary>
+<p>
+<p>The array must contain <strong>at least</strong> <em>one object corresponding to a feature</em> from <code class="docutils literal notranslate"><span class="pre">circles.json</span></code>, and must identify <strong>at least</strong> <em>one</em> of these features as <em>&quot;continuous&quot;</em>.</p>
+<p>For each object in the array, the key-value pairs are:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (required): The name of the feature.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string that matches the name of a feature in <code class="docutils literal notranslate"><span class="pre">circles.json</span></code>.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">label</span></code> (required): The label of the feature as it should be displayed
+in the app's UI.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">type</span></code> (optional): The type of the feature. Must be either
+&quot;continuous&quot; or &quot;discrete&quot;.</p>
+<ul class="simple">
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">&quot;discrete&quot;</span></code>.</p></li>
+<li><p><em>Acceptable</em>: <code class="docutils literal notranslate"><span class="pre">&quot;continuous&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;discrete&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;continuous&quot;</span></code>:</p>
+<ul>
+<li><p>Feature appears in the &quot;Size&quot; selector menu of the app's UI unless the <code class="docutils literal notranslate"><span class="pre">tooltip</span></code> key is set to <code class="docutils literal notranslate"><span class="pre">&quot;only&quot;</span></code>.</p></li>
+<li><p>Feature must be numerical in <code class="docutils literal notranslate"><span class="pre">circle.json</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;discrete&quot;</span></code>:</p>
+<ul>
+<li><p>Feature appears in the &quot;Color&quot; selector menu of the app's UI unless the <code class="docutils literal notranslate"><span class="pre">tooltip</span></code> key is set to <code class="docutils literal notranslate"><span class="pre">&quot;only&quot;</span></code>.</p></li>
+<li><p>Feature will be treated as categorical (even if it is supplied in a numerical format in <code class="docutils literal notranslate"><span class="pre">circle.json</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">tooltip</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;only&quot;</span></code>.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code>:</p>
+<ul>
+<li><p>The feature is included in the tooltip that appears when the user hovers over a circle.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">false</span></code>,</p>
+<ul>
+<li><p>The feature is <em>not</em> included in the tooltip that appears when the user hovers over a circle.</p></li>
+<li><p>The feature is included in the relevant selector menu of the app's UI (see <code class="docutils literal notranslate"><span class="pre">type</span></code>).</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;only&quot;</span></code>:</p>
+<ul>
+<li><p>The feature <em>is</em> included in the tooltip that appears when the user hovers over a circle.</p></li>
+<li><p>The feature is <em>not</em> included in the relevant selector menu of the app's UI (see <code class="docutils literal notranslate"><span class="pre">type</span></code>).</p></li>
+</ul>
+</li>
+<li><p><em>Note</em>: The tooltip is calibrated to include at least one feature (on top of each circle's name). If no features listed in
+<code class="docutils literal notranslate"><span class="pre">metadata.json</span></code> has <code class="docutils literal notranslate"><span class="pre">tooltip</span></code> set of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;only&quot;</span></code>, the
+dimensions of the tooltip will be slightly off.</p></li>
+</ul>
+<p>!!! The rest of this &quot;metadata&quot; section contains rough and
+approximative guidance on how to use the other metadata parameters.
+It is a barely edited copy-paste from old documentation and may not be
+up-to-date. TO DO: Update this documentation to better reflect the
+current state of the app and unify formatting !!!.</p>
+<p><code class="docutils literal notranslate"><span class="pre">color_bins</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: An array of numbers, e.g., <code class="docutils literal notranslate"><span class="pre">[1,10,100,300,600]</span></code>.</p></li>
+<li><p><em>Default</em>:</p>
+<ul>
+<li><p>Features marked as &quot;continuous&quot; :The quintiles of the feature's distribution.</p></li>
+<li><p>Features marked as &quot;discrete&quot;: <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p></li>
+</ul>
+</li>
+<li><p>For features marked as &quot;continuous&quot;, determines how circles are binned into discrete categories when the feature is selected in the &quot;Color&quot; selector (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;color_bins&quot;:</span> <span class="pre">[1,10,100,300,600]</span></code> bins the feature based on whether its value is between its minimum value and 1, between 1 and 10, …, between 300 and 600, and between 600 and the feature's maximum value).</p></li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">size_legend_bins</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: An array of numbers, e.g., <code class="docutils literal notranslate"><span class="pre">[5,</span> <span class="pre">100,300,600]</span></code>.</p></li>
+<li><p><em>Default</em>:</p>
+<ul>
+<li><p>Features marked as &quot;continuous&quot; :10%, 50%, and 100% quantiles of the feature's distribution.</p></li>
+<li><p>Features marked as &quot;discrete&quot;: <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Determines the set of values of features marked as &quot;continuous&quot; for which a bubble-size is displayed in the size-legend.</p></li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">scale_increasing</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: <code class="docutils literal notranslate"><span class="pre">“true”</span></code>, <code class="docutils literal notranslate"><span class="pre">“false”</span></code>.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">“true”</span></code> for features marked as &quot;continous&quot;, <code class="docutils literal notranslate"><span class="pre">undefined</span></code> for features marked as &quot;discrete&quot;.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">true</span></code>: For features marked as &quot;continuous&quot;, when the feature is selected through the &quot;Size&quot; selector, makes</p>
+<ul>
+<li><p>circle sizes  proportional  to the corresponding continuous feature.</p></li>
+<li><p>the size Legend display from lower to higher values.
+proportional (<code class="docutils literal notranslate"><span class="pre">“true”</span></code>) or inversely proportional (“false”) to the corresponding continuous feature.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">false</span></code>: For features marked as &quot;continuous&quot;, when the feature is selected through the &quot;Size&quot; selector, makes</p>
+<ul>
+<li><p>The size Legend is displayed from higher to lower values (<code class="docutils literal notranslate"><span class="pre">“false”</span></code>).</p></li>
+<li><p>circle sizes inversely proportional to the corresponding continuous feature.</p></li>
+</ul>
+</li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">scale_minSize</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: a single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p>Determines the lowest possible circle-size.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">scale_maxSize</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: a single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">50</span></code>.</p></li>
+<li><p>Determines the highest possible circle-size.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">scale_exponent</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: a single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p>Determines the curvature of the matching between the values of a feature identified as “continuous” and the corresponding circle-sizes.</p>
+<ul>
+<li><p>A value of 1 corresponds to a linear scale, i.e., all values of the feature between its min and max will be linearly recast to sizes between <code class="docutils literal notranslate"><span class="pre">scale_minSize</span></code> and <code class="docutils literal notranslate"><span class="pre">scale_maxSize</span></code>.</p></li>
+<li><p>A value above 1 corresponds to a concave scale, i.e., starting from <code class="docutils literal notranslate"><span class="pre">scale_minSize</span></code>, sizes will first increase fast with the value of the feature, and then increase slower and slower as they approach
+<code class="docutils literal notranslate"><span class="pre">scale_maxSize</span></code>.</p></li>
+<li><p>A value below 1 corresponds to a convex scale, i.e., starting from <code class="docutils literal notranslate"><span class="pre">scale_minSize</span></code>, sizes will first increase slowly with the value of the feature, and then increase faster and faster as they approach <code class="docutils literal notranslate"><span class="pre">scale_maxSize</span></code>.</p></li>
+</ul>
+</li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">unit</span></code>:</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: A string (<code class="docutils literal notranslate"><span class="pre">&quot;B&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;USD&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;$&quot;</span></code>).</p></li>
+<li><p><em>Default</em>: empty string <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>.</p></li>
+<li><p>Determines whether a unit sign is appended whenever the value of a continuous feature is displayed, whether in legends or in tooltips.</p></li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">truncate_label</span></code> (optional):</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: A single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">9</span></code>.</p></li>
+<li><p>Determines the number of characters after which the feature’s name label is truncated when displayed in the tooltip.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">truncate_value</span></code>:</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: A single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">6</span></code>.</p></li>
+<li><p>Determines the number of characters after which whether the value of the feature is truncated when displayed in the tooltip.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">legend_dline_extral</span></code>:</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: A single number.</p></li>
+<li><p><em>Default</em>: <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p>For features marked as &quot;continuous&quot;, determines the base-length of the dashed line connecting bubble-sizes to their label in the size-legend.</p></li>
+<li><p>No effect on features marked as &quot;discrete&quot;.</p></li>
+</ul>
+</div></blockquote>
+<p>Prototype of valid format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> 
+  <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;cluster&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Cluster Number&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;discrete&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mkvalt&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Market Value&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;tooltip&quot;</span> <span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>For a full example of the data format, see <code class="docutils literal notranslate"><span class="pre">src/data/metadata_TEMPLATE_DO_NOT_ERASE.json</span></code> in this repository.</p>
+<ul class="simple">
+<li><p>This is a reference template that should <em>not</em> be erased.
+You should copy it, rename it to <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code>,  and experiment editing the latter with your own data (you can always revert to the template if you break the data format and want a fresh start).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/data/metadata_TEMPLATE_DO_NOT_ERASE.json</span></code> is made to work with <code class="docutils literal notranslate"><span class="pre">src/data/circles_TEMPLATE_DO_NOT_ERASE.json</span></code>.</p></li>
+</ul>
+</p>
+</details>
+<details closed>
+<summary style = "font-size: 17px; font-weight: bold"> 
+ arrows.json
+</summary>
+<p>
+<p>Key-value pairs:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (required): The name of the arrow as it will be displayed in the app &gt;(also serves as a technical identifier inside the code).</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any string.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">x</span></code> (required): The x-coordinate of the arrow's head.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any number.</p></li>
+<li><p>By default, all arrows tails are placed x = 0.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">y</span></code> (required): The y-coordinate of the arrow's head.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any number.</p></li>
+<li><p>By default, all arrows tails are placed at y = 0.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">time</span></code> (required): The time at which the arrow's head is located.</p>
+<ul class="simple">
+<li><p><em>Acceptable</em>: Any number in the range of time periods included in <code class="docutils literal notranslate"><span class="pre">circle.json</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</br>
+<p>Support for missing time periods has not been tested.
+For <em>each</em> arrow identified in <code class="docutils literal notranslate"><span class="pre">arrows.json</span></code>, It is safest to provide <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> coordinates for <em>all</em> time periods included in <code class="docutils literal notranslate"><span class="pre">circle.json</span></code>.</p>
+<p>Prototype of valid format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FACTOR 1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">6.4079211884</span><span class="p">,</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">13.0098593574</span><span class="p">,</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1998</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FACTOR 1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">6.4444474746</span><span class="p">,</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">13.0361878325</span><span class="p">,</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1999</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FACTOR 1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">6.4658528654</span><span class="p">,</span>
+    <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">13.0025843621</span><span class="p">,</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="mi">2000</span>
+  <span class="p">}</span>
+  <span class="p">]</span>
+</pre></div>
+</div>
+<p>For a full example of the data format, see <code class="docutils literal notranslate"><span class="pre">src/data/arrows_TEMPLATE_DO_NOT_ERASE.json</span></code> in this repository.</p>
+<ul class="simple">
+<li><p>This is reference template that should <em>not</em> be erased.
+You should copy it, rename it to <code class="docutils literal notranslate"><span class="pre">arrows.json</span></code>, and experiment editing the latter with your own data (you can always revert to the template if you break the data format and want a fresh start).</p></li>
+</ul>
+</p>
+</details>
+<blockquote>
+<div><p><em>Note:</em> In accordance with <code class="docutils literal notranslate"><span class="pre">json</span></code> formatting rules, all keys and all string values must be enclosed in <em>double</em> quotes, e.g., <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;1ST</span> <span class="pre">SOURCE</span> <span class="pre">CORP&quot;</span></code>.</p>
+</div></blockquote>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">evomapjs</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Martin Van der Linden.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/data_details.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
