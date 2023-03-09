@@ -3,10 +3,10 @@ requires = ["setuptools", "numpy", "poetry-core>=1.4.0", "Cython"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "evomap"
+name = "evomapjs"
 version = "0.1.1"
-description = "A Python Toolbox for Mapping Evolving Relationship Data"
-authors = ["Maximilian Matthe, Daniel M. Ringel, and Bernd Skiera"]
+description = "A JS Toolbox for Mapping Evolving Relationship Data"
+authors = ["Martin Van der Linden"]
 license = "MIT"
 readme = "README.md"
 
