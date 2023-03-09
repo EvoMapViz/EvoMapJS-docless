@@ -1,18 +1,16 @@
 [build-system]
-requires = ["setuptools", "numpy", "poetry-core>=1.4.0", "Cython"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools", "numpy", "poetry-core>=1.4.0"]
 
 [tool.poetry]
-name = "evomap"
+name = "evomapjs"
 version = "0.1.1"
-description = "A Python Toolbox for Mapping Evolving Relationship Data"
-authors = ["Maximilian Matthe, Daniel M. Ringel, and Bernd Skiera"]
+description = "A JS Toolbox for Mapping Evolving Relationship Data"
+authors = ["Martin Van der Linden"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.build]
-generate-setup-file = true
-script = "build.py"
+generate-setup-file = false
 
 
 [tool.poetry.dependencies]
@@ -24,7 +22,6 @@ numba = "^0.55.1"
 ipykernel = ">=6.13.0"
 scipy = ">=1.7.0"
 seaborn = ">=0.11.2"
-Cython = "^0.29.33"
 statsmodels = "^0.13.2"
 setuptools = "^67.4.0"
 sphinx-book-theme = "^0.3.2"
@@ -34,4 +31,3 @@ jupyter = "^1.0.0"
 myst-nb = {version = "^0.13.2", python = "^3.9"}
 sphinx-autoapi = "^1.8.4"
 sphinx-rtd-theme = "^1.0.0"
-Cython = "^0.29.33"
