@@ -1,6 +1,6 @@
 maxdepth: 1
 hidden:
-theme: minima
+theme: just-the-docs
 
 data_overview.md
 data_details.md
